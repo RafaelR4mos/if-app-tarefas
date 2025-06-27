@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todoappv2/screens/home.dart';
 import 'package:todoappv2/screens/login.dart';
 import 'package:todoappv2/screens/cadastro.dart';
 import 'package:todoappv2/theme.dart';
@@ -18,6 +19,7 @@ class MainApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/cadastro': (context) => const CadastroScreen(),
+        '/home': (context) => const HomeScreen(),
       },
     );
   }

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
 class CadastroScreen extends StatefulWidget {
@@ -149,7 +147,7 @@ class CadastroScreenState extends State<CadastroScreen> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/login');
                     },
-                    child: const Text('Já possui conta? Faça Login'),
+                    child: const Text('Já possui conta? Faça login'),
                   ),
                 ),
               ],

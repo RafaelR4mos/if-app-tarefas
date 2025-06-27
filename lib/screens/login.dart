@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todoappv2/screens/home.dart';
+import 'package:todoappv2/service/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,6 +14,35 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController senhaController = TextEditingController();
 
   bool mostrarSenha = false;
+  bool carregando = false;
+
+  Future<void> tentarLogin() async {
+    try {
+      setState(() => carregando = true);
+      final sucesso = await AuthService.login(
+        emailController.text,
+        senhaController.text,
+      );
+
+      if (sucesso && mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => const AlertDialog(
+              title: Text('Erro'),
+              content: Text('Login inválido'),
+            ),
+      );
+    } finally {
+      setState(() => carregando = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,14 +110,15 @@ class LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      final email = emailController.text;
-                      final senha = senhaController.text;
-
-                      // Aqui você pode fazer a validação ou login
-                      debugPrint('E-mail: $email | Senha: $senha');
-                    },
-                    child: const Text('Entrar'),
+                    onPressed: tentarLogin,
+                    child:
+                        carregando
+                            ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : const Text('Entrar'),
                   ),
                 ),
                 SizedBox(
