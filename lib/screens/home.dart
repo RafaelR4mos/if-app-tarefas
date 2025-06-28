@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todoappv2/service/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,6 +10,15 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   final String nomeUsuario = 'Rafael Santos';
+
+  Future<void> realizarLogout() async {
+    try {
+      await AuthService.logout();
+      Navigator.pushNamed(context, '/login');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +36,29 @@ class HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CircleAvatar(
-                  radius: 18,
-                  backgroundColor: Colors.deepPurple,
-                  child: Text(
-                    getIniciais('Rafael Santos'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'logout') {
+                      realizarLogout();
+                      print('Logout');
+                    }
+                  },
+                  itemBuilder:
+                      (BuildContext context) => [
+                        const PopupMenuItem<String>(
+                          value: 'logout',
+                          child: Text('Logout'),
+                        ),
+                      ],
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.deepPurple,
+                    child: Text(
+                      getIniciais('Rafael Santos'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
