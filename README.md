@@ -2,9 +2,8 @@
 
 Aplicativo desenvolvido em Flutter para Gerenciamento de Tarefas.
 
-<p align="center">
-  ![image](https://github.com/user-attachments/assets/8c2201b9-dcd7-4f8c-b9e0-1b2d9c30cb06)
-</p>
+<img width=300 src="./assets/iScreen%20Shoter%20-%2020250703194042825.png" />
+
 <p align="center">
   Preview da tela inicial do app.
 </p>
@@ -19,7 +18,7 @@ Aplicativo desenvolvido em Flutter para Gerenciamento de Tarefas.
 - HTTP
 - FlutterToast
 - ImagePicker
-  
+
 ---
 
 ## 📁 Estrutura do Projeto
