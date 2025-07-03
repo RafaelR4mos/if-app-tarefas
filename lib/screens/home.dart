@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:todoappv2/model/task.dart';
 import 'package:todoappv2/service/auth_service.dart';
+import 'package:todoappv2/service/task_service.dart';
+import 'package:todoappv2/widgets/task_form.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,6 +13,27 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   final String nomeUsuario = 'Rafael Santos';
+  List<Task> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    carregarTarefas();
+  }
+
+  void carregarTarefas() async {
+    try {
+      final List<Task> tarefasCarregadas = await TaskService.fetchTasks();
+
+      if (!mounted) return;
+
+      setState(() {
+        tasks = tarefasCarregadas;
+      });
+    } catch (e) {
+      print('Erro ao carregar tarefas: $e');
+    }
+  }
 
   Future<void> realizarLogout() async {
     try {
@@ -22,9 +46,42 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEmpty = tasks.isEmpty;
+
+    void abrirBottomSheetNovaTask() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.grey[900],
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          return TaskForm(
+            onSave: (novaTask) async {
+              final sucesso = await TaskService.createTask(novaTask);
+
+              //Resolve problemas relacionado a destruição de widget.
+              if (!mounted) return;
+
+              if (sucesso) {
+                carregarTarefas();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Erro ao salvar tarefa')),
+                );
+              }
+
+              Navigator.of(context).pop();
+            },
+          );
+        },
+      );
+    }
+
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(90), // altura personalizada
+        preferredSize: const Size.fromHeight(90),
         child: Container(
           padding: const EdgeInsets.all(24.0),
           decoration: BoxDecoration(
@@ -92,7 +149,99 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: const Center(child: Text("Conteúdo da tela")),
+      body:
+          isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Substitua com sua imagem real
+                    Image.asset('assets/placeholder-tasks.png', width: 200),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'O que você quer fazer hoje?',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Toque em "+" para adicionar tarefas',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                  ],
+                ),
+              )
+              : ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: tasks.length,
+                itemBuilder: (context, index) {
+                  final task = tasks[index];
+                  return Card(
+                    color: Colors.grey[900],
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      title: Text(
+                        task.nomeTarefa,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        task.descricao,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(
+                          task.status == "F"
+                              ? Icons.check_box
+                              : Icons.check_box_outline_blank,
+                          color: Colors.white70,
+                        ),
+                        onPressed:
+                            task.status == "F"
+                                ? () async {
+                                  final sucesso =
+                                      await TaskService.desfinalizarTask(
+                                        task.idTarefa!,
+                                      );
+                                  if (sucesso) {
+                                    carregarTarefas();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Erro ao desfinalizar tarefa',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                                : () async {
+                                  final sucesso =
+                                      await TaskService.finalizarTask(
+                                        task.idTarefa!,
+                                      );
+                                  if (sucesso) {
+                                    carregarTarefas();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Erro ao finalizar tarefa',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                      ),
+                    ),
+                  );
+                },
+              ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurple,
+        onPressed: () {
+          abrirBottomSheetNovaTask();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
