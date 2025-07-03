@@ -3,7 +3,7 @@
 Aplicativo desenvolvido em Flutter para Gerenciamento de Tarefas.
 
 <p align="center">
-  ![image](https://github.com/user-attachments/assets/203169f6-1b6b-403d-b8ad-5ae57c6d14d4)
+  ![image](https://github.com/user-attachments/assets/8c2201b9-dcd7-4f8c-b9e0-1b2d9c30cb06)
 </p>
 <p align="center">
   Preview da tela inicial do app.
