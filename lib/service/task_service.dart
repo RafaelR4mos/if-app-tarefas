@@ -47,6 +47,44 @@ class TaskService {
     }
   }
 
+  static Future<bool> deleteTask(int idTarefa) async {
+    final token = await AuthService.getToken();
+    final url = Uri.parse('$baseUrl/task/$idTarefa');
+    final response = await http.delete(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      throw Exception("Erro ao deletar tarefa: ${response.statusCode}");
+    }
+  }
+
+  static Future<bool> updateTask(
+    int idTarefa,
+    String nomeTarefa,
+    String descricao,
+  ) async {
+    final token = await AuthService.getToken();
+    final url = Uri.parse('$baseUrl/task/$idTarefa');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'nomeTask': nomeTarefa, 'descricao': descricao}),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception("Erro ao editar tarefa: ${response.statusCode}");
+    }
+  }
+
   static Future<bool> finalizarTask(int idTarefa) async {
     final token = await AuthService.getToken();
     final url = Uri.parse('$baseUrl/task/$idTarefa/complete');

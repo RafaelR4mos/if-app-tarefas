@@ -17,6 +17,7 @@ class _TaskFormState extends State<TaskForm> {
 
   String titulo = "";
   String descricao = "";
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +67,11 @@ class _TaskFormState extends State<TaskForm> {
               TextFormField(
                 style: const TextStyle(color: Colors.white),
                 decoration: _inputDecoration('Descrição'),
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Informe a descrição'
+                            : null,
                 maxLines: 3,
                 onSaved: (value) => descricao = value!,
               ),
@@ -78,23 +84,32 @@ class _TaskFormState extends State<TaskForm> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurpleAccent,
                   ),
-                  icon: const Icon(Icons.add),
-                  label: const Text(
-                    'Criar',
-                    style: TextStyle(color: Colors.white),
+                  icon: _isLoading ? null : const Icon(Icons.add),
+                  label: Text(
+                    _isLoading ? 'Carregando...' : 'Criar',
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
+                  onPressed:
+                      _isLoading
+                          ? null
+                          : () async {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
 
-                      final novaTask = Task(
-                        nomeTarefa: titulo,
-                        descricao: descricao,
-                      );
+                              setState(() => _isLoading = true);
 
-                      widget.onSave(novaTask);
-                    }
-                  },
+                              final novaTask = Task(
+                                nomeTarefa: titulo,
+                                descricao: descricao,
+                              );
+
+                              await widget.onSave(novaTask);
+
+                              if (mounted) {
+                                setState(() => _isLoading = false);
+                              }
+                            }
+                          },
                 ),
               ),
             ],

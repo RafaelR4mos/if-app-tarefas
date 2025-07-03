@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todoappv2/model/task.dart';
+import 'package:todoappv2/screens/task_detail.dart';
 import 'package:todoappv2/service/auth_service.dart';
 import 'package:todoappv2/service/task_service.dart';
 import 'package:todoappv2/widgets/task_form.dart';
@@ -194,6 +195,7 @@ class HomeScreenState extends State<HomeScreen> {
                               : Icons.check_box_outline_blank,
                           color: Colors.white70,
                         ),
+
                         onPressed:
                             task.status == "F"
                                 ? () async {
@@ -231,6 +233,18 @@ class HomeScreenState extends State<HomeScreen> {
                                   }
                                 },
                       ),
+                      onTap: () async {
+                        final alteradoOuDeletado = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TaskDetailScreen(task: task),
+                          ),
+                        );
+
+                        if (alteradoOuDeletado) {
+                          carregarTarefas();
+                        }
+                      },
                     ),
                   );
                 },
